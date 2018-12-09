@@ -7,6 +7,9 @@ class Graph:
     def vertices(self):
         return self.__graph
 
+    def edges(self, vertex):
+        return self.__graph[vertex]
+
     def add_vertex(self, vertex):
         if vertex not in self.__graph:
             self.__graph[vertex] = []
@@ -59,7 +62,18 @@ class Graph:
                     self.__component_recursive(self.__graph[vertex], components[number_cmp])
                     vertices_visited = set([item for sublist in components.values() for item in sublist])
                     number_cmp +=1
-        return components
+
+        subgraphs = []
+        for component in components.values():
+            graph = Graph()
+            for vertex in component:
+                graph.add_vertex(vertex)
+                print(self.edges(vertex))
+                for vertex_adj in self.edges(vertex):
+                    graph.add_edge(vertex, vertex_adj)
+            subgraphs.append(graph)
+
+        return subgraphs
 
     def __component_recursive(self, vertices, component):
         for vertex in vertices:
@@ -101,9 +115,9 @@ if __name__ == "__main__":
 
     graph = Graph(g)
     print(graph)
-    #print(graph.number_components())
-    v = graph.cut_vertices()
-    print(v)
+    print(graph.components())
+    #v = graph.cut_vertices()
+    #print(v)
     #graph.components()
     #graph.rem_vertex('b')
     #print(graph.number_components())
