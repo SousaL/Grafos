@@ -2,7 +2,10 @@ from copy import deepcopy
 
 class Graph:
     def __init__(self, graph = None):
-        self.__graph = graph
+        if graph == None:
+            self.__graph = {}
+        else:
+            self.__graph = graph
 
     def vertices(self):
         return self.__graph
@@ -70,7 +73,7 @@ class Graph:
                 graph.add_vertex(vertex)
                 print(self.edges(vertex))
                 for vertex_adj in self.edges(vertex):
-                    graph.add_edge(vertex, vertex_adj)
+                    graph.add_edge((vertex, vertex_adj))
             subgraphs.append(graph)
 
         return subgraphs
@@ -85,19 +88,37 @@ class Graph:
         #print(self.__graph)
         return len(self.components())
 
-    def cut_vertices(self):
-        vertices = []
-        components = self.number_components()
-        for vertex in self.__graph:
-            #print(self)
-            g_temp = Graph(deepcopy(self.__graph))
-            g_temp.rem_vertex(vertex)
-            print(g_temp)
-            print(self)
-            if(components < g_temp.number_components()):
-                vertices.append(vertex)
+    def tree(self, vertex, vertices):
+        #root = list(tree.keys())[0]
+        #if(len(tree[root][1]) > 1):
+        #    art.append(root)
 
-        return vertices
+        vertices.remove(vertex)
+        level = 0
+
+        self.__tree_recursive(vertex, vertices, level)
+
+        pass
+
+    def __tree_recursive(self, vertex, vertices, level):
+        """
+        Args:
+            vertex: input vertex
+            vertices: vertices not visited
+        Output:
+            tree with vertices from graph
+        """
+
+        for adjecent in self.__graph[vertex]:
+            if adjecent in vertices:
+                vertices.remove(adjecent)
+                print(adjacent)
+                self.__tree_recursive(adjacent, vertices, level + 1)
+
+
+
+
+        pass
 
 
 
