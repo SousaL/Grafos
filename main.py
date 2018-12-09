@@ -25,6 +25,10 @@ class Graph:
     def add_edge(self, edge):
         edge = set(edge)
         (vertex1,vertex2) = tuple(edge)
+
+        if vertex1 in self.__graph and vertex2 in self.__graph[vertex1]:
+            return
+
         if vertex1 in self.__graph:
             self.__graph[vertex1].append(vertex2)
         else:
@@ -71,7 +75,7 @@ class Graph:
             graph = Graph()
             for vertex in component:
                 graph.add_vertex(vertex)
-                print(self.edges(vertex))
+                #print(self.edges(vertex))
                 for vertex_adj in self.edges(vertex):
                     graph.add_edge((vertex, vertex_adj))
             subgraphs.append(graph)
@@ -136,7 +140,7 @@ if __name__ == "__main__":
 
     graph = Graph(g)
     print(graph)
-    print(graph.components())
+    print(graph.components()[0])
     #v = graph.cut_vertices()
     #print(v)
     #graph.components()
