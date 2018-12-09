@@ -92,37 +92,51 @@ class Graph:
         #print(self.__graph)
         return len(self.components())
 
-    def tree(self, vertex, vertices):
+    def tree(self, vertex):
+        """
+        function to start recursively dfs on graph structure
+
+        Args:
+            vertex: input vertex, considered as root vertex
+        Output:
+            dictionary tree with vertices from graph
+        """
+
         #root = list(tree.keys())[0]
         #if(len(tree[root][1]) > 1):
         #    art.append(root)
 
+        vertices = list(self.__graph.keys())
         vertices.remove(vertex)
         level = 0
 
-        self.__tree_recursive(vertex, vertices, level)
-
-        pass
+        return self.__tree_recursive(vertex, vertices, level)
 
     def __tree_recursive(self, vertex, vertices, level):
         """
         Args:
             vertex: input vertex
             vertices: vertices not visited
+            level: to identify the level of vertex
         Output:
-            tree with vertices from graph
+            dictionary tree with vertices from graph
         """
-
-        for adjecent in self.__graph[vertex]:
-            if adjecent in vertices:
-                vertices.remove(adjecent)
+        dict_tree = {}
+        vert_visited = []
+        for adjacent in self.__graph[vertex]:
+            if adjacent in vertices:
+                vertices.remove(adjacent)
                 print(adjacent)
-                self.__tree_recursive(adjacent, vertices, level + 1)
+                vert_visited.append(adjacent)
+                dict_tree[vertex] = (level, vert_visited)
+                ret = self.__tree_recursive(adjacent, vertices, level + 1)
+                dict_tree = {**dict_tree, **ret}
 
 
+        if dict_tree == {}:
+            dict_tree[vertex] = (level, [])
 
-
-        pass
+        return dict_tree
 
 
 
@@ -138,9 +152,23 @@ if __name__ == "__main__":
             "h" : ["g"],
             "i" : ["g"]}
 
-    graph = Graph(g)
+    h = { '1' : ['2','8','9','10'],
+            '2' : ['1','3','4','5','8','10'],
+            '3' : ['2','4','5'],
+            '4' : ['2','3','5'],
+            '5' : ['2','3','4'],
+            '6' : ['7','8'],
+            '7' : ['6','8'],
+            '8' : ['1','2','6','7','9'],
+            '9' : ['1','8'],
+            '10' : ['1','2']}
+
+
+    graph = Graph(h)
     print(graph)
-    print(graph.components()[0])
+    c = graph.components()[0]
+    t = c.tree("8")
+    print(t)
     #v = graph.cut_vertices()
     #print(v)
     #graph.components()
