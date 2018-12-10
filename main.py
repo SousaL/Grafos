@@ -219,13 +219,43 @@ class Graph:
             dict_tree = {**dict_tree, **ret}
         return dict_tree
 
-    def subtree_has_demarker(self, subtree, demarker):
-        
+    def subtree_has_articulation(self, subtree, articulations):
+        for vertex in subtree:
+            if vertex in articulations:
+                return True
+
+        return False
 
 
-    def biconnected_component(self, tree, articulation, demarkers):
+    def biconnected_component(self, tree, articulations, demarkers):
+        bcc = []
+        tree = deepcopy(tree)
+        while demarkers:
+            for demark in demarkers:
+                subtree = self.subtree(tree, demark)
+                if self.subtree_has_articulation(subtree, articulations):
+                    continue
+                vertex = None
+                for v in articulations:
+                    if demark in tree[v][1]:
+                        vertex = v
+                        break
 
-        pass
+                bcc.append([vertex] + list(subtree.keys()))
+                print(bcc)
+                demarkers.remove(demark)
+
+                for leaf in subtree:
+                    del tree[leaf]
+                    for leaf2 in tree:
+                        if leaf in tree[leaf2][1]:
+                            tree[leaf2][1].remove(leaf)
+
+                if set(tree[v][1]).intersection(set(demarkers)) == set():
+                    articulations.remove(v)
+
+                input()
+        return bcc
 
 
 
@@ -275,6 +305,8 @@ if __name__ == "__main__":
     print(dkr)
     sbt = graph.subtree(t, "1")
     print(sbt)
+    print("bbc")
+    bbc = graph.biconnected_component(t,ar,dkr)
     #v = graph.cut_vertices()
     #print(v)
     #graph.components()
