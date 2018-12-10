@@ -136,6 +136,13 @@ class Graph:
         return dict_tree
 
     def lowpoint(self, tree):
+        """
+        Args:
+            tree: tree massa
+        Output:
+            dictionary tree with vertices from graph
+            {#vertex, #lowpoint}
+        """
         dict_lwpt = {}
         root = list(tree.keys())[0]
         dict_lwpt[root] = root
@@ -154,6 +161,35 @@ class Graph:
 
 
         return dict_lwpt
+
+    def articulation(self, tree, lowpoint):
+        """
+        Args:
+            tree: tree massa
+            lowpoint: lowpoint
+        Output:
+            dictionary tree with vertices from graph
+            {#vertex, #lowpoint}
+        """
+        art = []
+
+        root = list(tree.keys())[0] #pega a rais do dict_tree
+        level, childs = tree[root]
+        if(len(childs) > 1):
+            art.append(root)
+
+        for vertex in tree:
+            if vertex != root:
+                for adj in tree[vertex][1]:
+                    if lowpoint[adj] == vertex or lowpoint[adj] == adj:
+                        art.append(vertex)
+                        break
+
+
+        return art
+
+
+
 
 
 
@@ -190,6 +226,9 @@ if __name__ == "__main__":
     print(t)
     print("low point")
     print(lp)
+    ar = graph.articulation(t, lp)
+    print("articulation")
+    print(ar)
     #v = graph.cut_vertices()
     #print(v)
     #graph.components()
