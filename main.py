@@ -185,9 +185,31 @@ class Graph:
                         art.append(vertex)
                         break
 
-
         return art
 
+
+    def demarker(self, tree, lowpoint):
+        """
+        Args:
+            tree: tree massa
+            lowpoint: lowpoint
+        Output:
+            dictionary demarker with vertices from graph
+            {#vertex, #lowpoint}
+        """
+        dkr = []
+
+        root = list(tree.keys())[0] #pega a rais do dict_tree
+        level, childs = tree[root]
+        dkr = deepcopy(childs)
+
+        for vertex in tree:
+            if vertex != root and vertex not in childs:
+                for adj in tree[vertex][1]:
+                    if lowpoint[adj] == vertex or lowpoint[adj] == adj:
+                        dkr.append(adj)
+
+        return dkr
 
 
 
@@ -229,6 +251,11 @@ if __name__ == "__main__":
     ar = graph.articulation(t, lp)
     print("articulation")
     print(ar)
+    dkr = graph.demarker(t, lp)
+    print("demarker")
+    print(dkr)
+
+
     #v = graph.cut_vertices()
     #print(v)
     #graph.components()
