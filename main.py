@@ -94,17 +94,14 @@ class Graph:
 
     def tree(self, vertex):
         """
-        function to start recursively dfs on graph structure
+        Function to start recursively dfs on graph structure
 
         Args:
             vertex: input vertex, considered as root vertex
         Output:
             dictionary tree with vertices from graph
+            {#vertex, (#level, [#adjacents])}
         """
-
-        #root = list(tree.keys())[0]
-        #if(len(tree[root][1]) > 1):
-        #    art.append(root)
 
         vertices = list(self.__graph.keys())
         vertices.remove(vertex)
@@ -120,13 +117,13 @@ class Graph:
             level: to identify the level of vertex
         Output:
             dictionary tree with vertices from graph
+            {#vertex, (#level, [#adjacents])}
         """
         dict_tree = {}
         vert_visited = []
         for adjacent in self.__graph[vertex]:
             if adjacent in vertices:
                 vertices.remove(adjacent)
-                print(adjacent)
                 vert_visited.append(adjacent)
                 dict_tree[vertex] = (level, vert_visited)
                 ret = self.__tree_recursive(adjacent, vertices, level + 1)
@@ -137,6 +134,26 @@ class Graph:
             dict_tree[vertex] = (level, [])
 
         return dict_tree
+
+    def lowpoint(self, tree):
+        dict_lwpt = {}
+        root = list(tree.keys())[0]
+        dict_lwpt[root] = root
+        for vertex in tree:
+            level, adjs = tree[vertex]
+            for adj in adjs:
+                dict_lwpt[adj] = vertex
+
+        for vertex in dict_lwpt:
+            lvl, adjs = tree[dict_lwpt[vertex]]
+            if lvl > 0 :
+                for adj in self.__graph[vertex]:
+                    new_lvl, new_vertex = (tree[adj][0], adj)
+                    if new_lvl < lvl:
+                        dict_lwpt[vertex] = new_vertex
+
+
+        return dict_lwpt
 
 
 
@@ -168,7 +185,11 @@ if __name__ == "__main__":
     print(graph)
     c = graph.components()[0]
     t = c.tree("8")
+    lp = graph.lowpoint(t)
+    print("tree")
     print(t)
+    print("low point")
+    print(lp)
     #v = graph.cut_vertices()
     #print(v)
     #graph.components()
