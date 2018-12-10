@@ -211,6 +211,25 @@ class Graph:
 
         return dkr
 
+    def subtree(self, tree, vertex):
+        dict_tree = {}
+        dict_tree[vertex] = deepcopy(tree[vertex])
+        for adj in tree[vertex][1]:
+            ret = self.subtree(tree, adj)
+            dict_tree = {**dict_tree, **ret}
+        return dict_tree
+
+    def subtree_has_demarker(self, subtree, demarker):
+        
+
+
+    def biconnected_component(self, tree, articulation, demarkers):
+
+        pass
+
+
+
+
 
 
 
@@ -254,8 +273,8 @@ if __name__ == "__main__":
     dkr = graph.demarker(t, lp)
     print("demarker")
     print(dkr)
-
-
+    sbt = graph.subtree(t, "1")
+    print(sbt)
     #v = graph.cut_vertices()
     #print(v)
     #graph.components()
