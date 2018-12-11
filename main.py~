@@ -263,7 +263,7 @@ class Graph:
                     if demark in tree[v][1]:
                         vertex = v
                         break
-                if vertex == None:
+		if vertex == None:
                     bcc.append([list(tree.keys())[0]] + list(subtree.keys()))
                 else:
                     bcc.append([vertex] + list(subtree.keys()))
