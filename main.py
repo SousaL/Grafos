@@ -10,6 +10,9 @@ class Graph:
     def vertices(self):
         return self.__graph
 
+    def first_vertex(self):
+        return list(self.__graph.keys())[0]
+
     def edges(self, vertex):
         return self.__graph[vertex]
 
@@ -54,6 +57,8 @@ class Graph:
             s += str(v) + " -> "
             s += ",".join(self.__graph[v])
             s += "\n"
+
+        s += str(self.__graph)
         return s
 
     def components(self):
@@ -199,15 +204,14 @@ class Graph:
         """
         dkr = []
 
-        root = list(tree.keys())[0] #pega a rais do dict_tree
-        level, childs = tree[root]
-        dkr = deepcopy(childs)
+        #root = list(tree.keys())[0] #pega a rais do dict_tree
+        #level, childs = tree[root]
+        #dkr = deepcopy(childs)
 
         for vertex in tree:
-            if vertex != root and vertex not in childs:
-                for adj in tree[vertex][1]:
-                    if lowpoint[adj] == vertex or lowpoint[adj] == adj:
-                        dkr.append(adj)
+            for adj in tree[vertex][1]:
+                if lowpoint[adj] == vertex or lowpoint[adj] == adj:
+                    dkr.append(adj)
 
         return dkr
 
@@ -230,6 +234,11 @@ class Graph:
     def biconnected_component(self, tree, articulations, demarkers):
         bcc = []
         tree = deepcopy(tree)
+
+        if articulations == []:
+            bbc.append(list(tree.keys()))
+            return bbc
+
         while demarkers:
             for demark in demarkers:
                 subtree = self.subtree(tree, demark)
@@ -242,7 +251,6 @@ class Graph:
                         break
 
                 bcc.append([vertex] + list(subtree.keys()))
-                print(bcc)
                 demarkers.remove(demark)
 
                 for leaf in subtree:
@@ -251,15 +259,83 @@ class Graph:
                         if leaf in tree[leaf2][1]:
                             tree[leaf2][1].remove(leaf)
 
-                if set(tree[v][1]).intersection(set(demarkers)) == set():
+                if set(tree[vertex][1]).intersection(set(demarkers)) == set():
                     articulations.remove(v)
 
-                input()
         return bcc
 
+    def simple(self, b_components):
+
+        for component in b_components:
+            for vertex in component:
+                if len(self.__graph[vertex]) == 2:
+                    vertex1, vertex2 = self.__graph[vertex]
+
+                    del self.__graph[vertex]
+                    component.remove(vertex)
+                    for c in b_components:
+                        if vertex in c:
+                            c.remove(vertex)
+
+                    self.__graph[vertex1].remove(vertex)
+                    self.__graph[vertex2].remove(vertex)
 
 
+                    new_vertex = vertex1 + vertex2
+                    self.add_vertex(new_vertex)
 
+                    for adj in self.__graph[vertex1]:
+                        if adj != vertex2:
+                            self.__graph[adj].remove(vertex1)
+                            self.add_edge((adj, new_vertex))
+
+                    for adj in self.__graph[vertex2]:
+                        if adj != vertex1:
+                            self.__graph[adj].remove(vertex2)
+                            self.add_edge((adj, new_vertex))
+
+                    del self.__graph[vertex1]
+                    del self.__graph[vertex2]
+                    component.remove(vertex1)
+                    component.remove(vertex2)
+                    for c in b_components:
+                        if vertex1 in c:
+                            c.remove(vertex1)
+                        if vertex2 in c:
+                            c.remove(vertex2)
+
+
+    def resume(self):
+        graph = self
+        print(graph)
+        while True:
+            for c in graph.components():
+                root = c.first_vertex()
+                t = c.tree(root)
+                lp = graph.lowpoint(t)
+                print("tree")
+                print(t)
+                print("-----------------------------------")
+                print("low point")
+                print(lp)
+                print("-----------------------------------")
+                ar = graph.articulation(t, lp)
+                if ar == []:
+                    return
+                print("articulation")
+                print(ar)
+                print("-----------------------------------")
+                dkr = graph.demarker(t, lp)
+                print("demarker")
+                print(dkr)
+                print("-----------------------------------")
+                print("bbc")
+                bbc = graph.biconnected_component(t,ar,dkr)
+                print(bbc)
+                print("-----------------------------------")
+                graph.simple(bbc)
+                print(graph)
+                input()
 
 
 
@@ -289,24 +365,29 @@ if __name__ == "__main__":
 
 
     graph = Graph(h)
-    print(graph)
-    c = graph.components()[0]
-    t = c.tree("8")
-    lp = graph.lowpoint(t)
-    print("tree")
-    print(t)
-    print("low point")
-    print(lp)
-    ar = graph.articulation(t, lp)
-    print("articulation")
-    print(ar)
-    dkr = graph.demarker(t, lp)
-    print("demarker")
-    print(dkr)
-    sbt = graph.subtree(t, "1")
-    print(sbt)
-    print("bbc")
-    bbc = graph.biconnected_component(t,ar,dkr)
+    graph.resume()
+    #c = graph.components()[0]
+    #t = c.tree("8")
+    #lp = graph.lowpoint(t)
+    #print("tree")
+    #print(t)
+    #print("low point")
+    #print(lp)
+    #ar = graph.articulation(t, lp)
+    #print("articulation")
+    #print(ar)
+    #dkr = graph.demarker(t, lp)
+    #print("demarker")
+    #print(dkr)
+    #sbt = graph.subtree(t, "1")
+    #print(sbt)
+    #print("bbc")
+    #bbc = graph.biconnected_component(t,ar,dkr)
+    #print(bbc)
+    #print(graph)
+    #graph.simple(bbc)
+    #print(graph)
+
     #v = graph.cut_vertices()
     #print(v)
     #graph.components()
