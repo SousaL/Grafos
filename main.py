@@ -1,11 +1,17 @@
 from copy import deepcopy
 
 class Graph:
-    def __init__(self, graph = None):
+    def __init__(self, graph = None, out = None):
         if graph == None:
             self.__graph = {}
         else:
             self.__graph = graph
+
+        self.out = out
+
+    def __write(self, msg):
+        if out != None:
+            out.write(msg)
 
     def vertices(self):
         return self.__graph
@@ -61,7 +67,7 @@ class Graph:
         s += str(self.__graph)
         return s
 
-    def components(self):
+    def components(self, w = False):
         number_cmp = 0
         components = {number_cmp : []}
         vertices_visited = set([item for sublist in components.values() for item in sublist])
@@ -76,8 +82,12 @@ class Graph:
                     number_cmp +=1
 
         subgraphs = []
+        if w == True:
+            self.__write("Foram encontradas " + str(len(components)) + " conexas: ")
         for component in components.values():
             graph = Graph()
+            if w == True:
+                self.__write(','.join(component) + '\n')
             for vertex in component:
                 graph.add_vertex(vertex)
                 #print(self.edges(vertex))
@@ -274,7 +284,8 @@ class Graph:
             for vertex in component:
                 if len(self.__graph[vertex]) == 2:
                     vertex1, vertex2 = self.__graph[vertex]
-
+                    self.__write("arestas(" + vertex1 + ',' + vertex + ") e (" + vertex + ',' + vertex2 + ") unificadas na aresta (" + vertex1 + ',' + vertex2 + ")\n")
+                    self.__write("uma das duas arestas (" + vertex1 + ',' + vertex2 + ") foi eliminada\n")
                     del self.__graph[vertex]
                     component.remove(vertex)
                     for c in b_components:
@@ -283,35 +294,36 @@ class Graph:
 
                     self.__graph[vertex1].remove(vertex)
                     self.__graph[vertex2].remove(vertex)
+                    self.add_edge((vertex1, vertex2))
 
+                    #new_vertex = vertex1 + vertex + vertex2
+                    #self.add_vertex(new_vertex)
 
-                    new_vertex = vertex1 + vertex + vertex2
-                    self.add_vertex(new_vertex)
+                    #for adj in self.__graph[vertex1]:
+                    #    if adj != vertex2:
+                    #        self.__graph[adj].remove(vertex1)
+                    #        self.add_edge((adj, new_vertex))
 
-                    for adj in self.__graph[vertex1]:
-                        if adj != vertex2:
-                            self.__graph[adj].remove(vertex1)
-                            self.add_edge((adj, new_vertex))
+                    #for adj in self.__graph[vertex2]:
+                    #    if adj != vertex1:
+                    #        self.__graph[adj].remove(vertex2)
+                    #        self.add_edge((adj, new_vertex))
 
-                    for adj in self.__graph[vertex2]:
-                        if adj != vertex1:
-                            self.__graph[adj].remove(vertex2)
-                            self.add_edge((adj, new_vertex))
-
-                    del self.__graph[vertex1]
-                    del self.__graph[vertex2]
-                    if vertex1 in component:
-                        component.remove(vertex1)
-                    if vertex2 in component:
-                        component.remove(vertex2)
-                    for c in b_components:
-                        if vertex1 in c:
-                            c.remove(vertex1)
-                        if vertex2 in c:
-                            c.remove(vertex2)
+                    #del self.__graph[vertex1]
+                    #del self.__graph[vertex2]
+                    #if vertex1 in component:
+                    #    component.remove(vertex1)
+                    #if vertex2 in component:
+                    #    component.remove(vertex2)
+                    #for c in b_components:
+                    #    if vertex1 in c:
+                    #        c.remove(vertex1)
+                    #    if vertex2 in c:
+                    #        c.remove(vertex2)
 
 
     def resume(self):
+        self.components(True)
         graph = self
         print(graph)
         while True:
@@ -327,6 +339,8 @@ class Graph:
                 print(lp)
                 print("-----------------------------------")
                 ar = graph.articulation(t, lp)
+                if ar:
+                    self.__write("Vertices " + ','.join(ar) + " sao pontes\n")
                 if ar == []:
                     return
                 print("articulation")
@@ -338,6 +352,10 @@ class Graph:
                 print("-----------------------------------")
                 print("bbc")
                 bbc = graph.biconnected_component(t,ar,dkr)
+                self.__write("Foram identificadas " + str(len(bbc)) + " partes: ")
+                for b in bbc:
+                    self.__write(",".join(b) + ';  ')
+                self.__write('\n')
                 print(bbc)
                 print("-----------------------------------")
                 graph.simple(bbc)
@@ -370,9 +388,33 @@ if __name__ == "__main__":
             '9' : ['1','8'],
             '10' : ['1','2']}
 
-
+    f = open("in.txt")
+    out = open("out.txt","w")
     graph = Graph(h)
     graph.resume()
+
+    number_graphs = int(f.readline())
+    for n in range(0, number_graphs):
+        number_vertex = int(f.readline())
+        out.write("Grafo " + str(n+1) + ':\n')
+        d = {}
+        for t in range(0, number_vertex):
+            d[str(t+1)] = []
+        graph = Graph(d, out)
+        for vertex in range(0, number_vertex):
+            edges_array = f.readline().split(' ')
+            number_edges = edges_array[0]
+            edges = edges_array[1:]
+            edges[-1] = edges[-1].strip()
+            for e in edges:
+                graph.add_edge((e,str(vertex+1)))
+
+        print(graph)
+        graph.resume()
+
+    #input()
+    ##graph = Graph(h)
+    #graph.resume()
     #c = graph.components()[0]
     #t = c.tree("8")
     #lp = graph.lowpoint(t)
