@@ -180,7 +180,7 @@ class Graph:
 
         root = list(tree.keys())[0] #pega a rais do dict_tree
         level, childs = tree[root]
-        if(len(childs) > 1):
+        if(len(childs) > 0):
             art.append(root)
 
         for vertex in tree:
@@ -259,6 +259,10 @@ class Graph:
                         if leaf in tree[leaf2][1]:
                             tree[leaf2][1].remove(leaf)
 
+                print(articulations)
+                print(demark)
+                print(demarkers)
+                print("***")
                 if set(tree[vertex][1]).intersection(set(demarkers)) == set():
                     articulations.remove(v)
 
@@ -281,7 +285,7 @@ class Graph:
                     self.__graph[vertex2].remove(vertex)
 
 
-                    new_vertex = vertex1 + vertex2
+                    new_vertex = vertex1 + vertex + vertex2
                     self.add_vertex(new_vertex)
 
                     for adj in self.__graph[vertex1]:
@@ -296,8 +300,10 @@ class Graph:
 
                     del self.__graph[vertex1]
                     del self.__graph[vertex2]
-                    component.remove(vertex1)
-                    component.remove(vertex2)
+                    if vertex1 in component:
+                        component.remove(vertex1)
+                    if vertex2 in component:
+                        component.remove(vertex2)
                     for c in b_components:
                         if vertex1 in c:
                             c.remove(vertex1)
@@ -310,6 +316,7 @@ class Graph:
         print(graph)
         while True:
             for c in graph.components():
+                old = deepcopy(self.__graph)
                 root = c.first_vertex()
                 t = c.tree(root)
                 lp = graph.lowpoint(t)
@@ -335,8 +342,8 @@ class Graph:
                 print("-----------------------------------")
                 graph.simple(bbc)
                 print(graph)
-                input()
-
+                if old == self.__graph:
+                    return
 
 
 
